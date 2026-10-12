@@ -1,0 +1,1260 @@
+================================================================
+pink-agentic-payments-mcp -- live test output
+Date: 2026-10-12. Sandbox workspace id: rtthxqd77x (created via
+POST https://agentic-sandbox.pinkwallet.com/v1/sandbox/workspaces, test
+money only, excluded from metrics).
+================================================================
+
+=== TEST 2: live stdio bridge (scripts/test-live.ts via StdioClientTransport,
+    running the built dist/bin.js, agent = Inventory AI) ===
+
+=== tools/list ===
+[server stderr] [pink-agentic-payments-mcp] bridging stdio <-> https://agentic-sandbox.pinkwallet.com/mcp
+{
+  "tools": [
+    {
+      "name": "pink.get_budget",
+      "title": "My budget and limits",
+      "description": "What this agent may still spend: monthly budget left, spent today, single-payment cap, vault balances, company daily ceiling.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "pink.list_payees",
+      "title": "Approved payees",
+      "description": "Suppliers, platforms and contractors this company has approved. Paying anyone else stops and asks a person.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "pink.list_rules",
+      "title": "Rules that apply to me",
+      "description": "The policy rules that apply to this agent, in evaluation order. First match decides: allow, ask, or block. Time-of-day rules show the timezone (tz) the server reads them in.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "pink.check_policy",
+      "title": "Would this payment clear?",
+      "description": "Dry run. Returns would_allow / would_ask / would_block with the rule and the full decision trace. Nothing is spent or held.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "payee_id": {
+            "type": "string",
+            "description": "Id from pink.list_payees. Omit for a payee not on the list."
+          },
+          "payee_name": {
+            "type": "string",
+            "description": "Name of the payee. Required if payee_id is omitted."
+          },
+          "amount": {
+            "type": "number",
+            "description": "Amount in the payment currency"
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "USD",
+              "EUR",
+              "GBP",
+              "HKD",
+              "SGD",
+              "JPY"
+            ],
+            "default": "USD"
+          },
+          "purpose": {
+            "type": "string",
+            "description": "What this payment is for, in one line (shown to approvers)"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Why you are making it now: the data you saw, the threshold that triggered it (shown to approvers)"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "References you can attach: PO number, invoice id, ticket id, statement id, photos"
+          },
+          "evidence_flags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "po",
+                "sow",
+                "ticket",
+                "scan",
+                "statement",
+                "brief",
+                "renewal",
+                "dupInvoice",
+                "payeeChanged",
+                "repeatCustomer",
+                "deposit"
+              ]
+            },
+            "description": "Structured evidence and signals: po (matching purchase order), sow (signed SOW), ticket (helpdesk ticket), scan (warehouse scan), statement (matches carrier/cloud statement), brief (signed creator brief), renewal (within 10% of last invoice), dupInvoice, payeeChanged, repeatCustomer, deposit"
+          },
+          "local_hour": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 23,
+            "description": "Dry run only: simulate this hour of day (0-23) in the rule's timezone for pink.check_policy. pink.request_payment ignores it and uses the server clock."
+          }
+        },
+        "required": [
+          "amount",
+          "purpose"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "pink.request_payment",
+      "title": "Request a payment",
+      "description": "The real call. Returns \"allowed\" with a single-use credential, \"pending_human\" with a hold_id while a person is asked, or \"blocked\" with the reason. Pass idempotency_key to make retries safe.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "payee_id": {
+            "type": "string",
+            "description": "Id from pink.list_payees. Omit for a payee not on the list."
+          },
+          "payee_name": {
+            "type": "string",
+            "description": "Name of the payee. Required if payee_id is omitted."
+          },
+          "amount": {
+            "type": "number",
+            "description": "Amount in the payment currency"
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "USD",
+              "EUR",
+              "GBP",
+              "HKD",
+              "SGD",
+              "JPY"
+            ],
+            "default": "USD"
+          },
+          "purpose": {
+            "type": "string",
+            "description": "What this payment is for, in one line (shown to approvers)"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Why you are making it now: the data you saw, the threshold that triggered it (shown to approvers)"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "References you can attach: PO number, invoice id, ticket id, statement id, photos"
+          },
+          "evidence_flags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "po",
+                "sow",
+                "ticket",
+                "scan",
+                "statement",
+                "brief",
+                "renewal",
+                "dupInvoice",
+                "payeeChanged",
+                "repeatCustomer",
+                "deposit"
+              ]
+            },
+            "description": "Structured evidence and signals: po (matching purchase order), sow (signed SOW), ticket (helpdesk ticket), scan (warehouse scan), statement (matches carrier/cloud statement), brief (signed creator brief), renewal (within 10% of last invoice), dupInvoice, payeeChanged, repeatCustomer, deposit"
+          },
+          "local_hour": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 23,
+            "description": "Dry run only: simulate this hour of day (0-23) in the rule's timezone for pink.check_policy. pink.request_payment ignores it and uses the server clock."
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Any unique string per payment attempt. Repeating a key returns the original decision instead of paying twice; reusing it for a different payment is refused."
+          }
+        },
+        "required": [
+          "amount",
+          "purpose"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "pink.get_credential",
+      "title": "Poll a hold",
+      "description": "Check a pending payment. When a person approves, this returns the credential. Also works for any payment_id.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "hold_id": {
+            "type": "string",
+            "description": "The hold_id / payment_id returned by pink.request_payment"
+          }
+        },
+        "required": [
+          "hold_id"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "pink.report_receipt",
+      "title": "File the receipt",
+      "description": "After paying, file the receipt or invoice so the payment is reconciled and your trust score goes up.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "payment_id": {
+            "type": "string"
+          },
+          "receipt": {
+            "type": "object",
+            "properties": {
+              "merchant": {
+                "type": "string"
+              },
+              "total": {
+                "type": "number"
+              },
+              "currency": {
+                "type": "string"
+              },
+              "reference": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "note": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required": [
+          "payment_id",
+          "receipt"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    }
+  ]
+}
+
+=== pink.get_budget ===
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"agent\": \"Inventory AI\",\n  \"status\": \"active\",\n  \"monthly_budget\": 2500,\n  \"spent_this_month\": 1180,\n  \"left_this_month\": 1320,\n  \"spent_today\": 0,\n  \"single_payment_cap\": 300,\n  \"vault\": {\n    \"id\": \"v_ops\",\n    \"name\": \"Operating\",\n    \"balances\": {\n      \"USD\": 18420.55\n    }\n  },\n  \"company_daily_ceiling\": 6000,\n  \"company_spent_today\": 0,\n  \"policy_version\": 1\n}"
+    }
+  ],
+  "structuredContent": {
+    "agent": "Inventory AI",
+    "status": "active",
+    "monthly_budget": 2500,
+    "spent_this_month": 1180,
+    "left_this_month": 1320,
+    "spent_today": 0,
+    "single_payment_cap": 300,
+    "vault": {
+      "id": "v_ops",
+      "name": "Operating",
+      "balances": {
+        "USD": 18420.55
+      }
+    },
+    "company_daily_ceiling": 6000,
+    "company_spent_today": 0,
+    "policy_version": 1
+  }
+}
+
+=== pink.list_payees ===
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"payees\": [\n    {\n      \"id\": \"p_cc\",\n      \"name\": \"Counter Culture Coffee\",\n      \"category\": \"supplier\",\n      \"paid_by\": \"bank\",\n      \"country\": \"US\",\n      \"currency\": \"USD\",\n      \"note\": \"Beans · net 15\"\n    },\n    {\n      \"id\": \"p_sysco\",\n      \"name\": \"Sysco\",\n      \"category\": \"supplier\",\n      \"paid_by\": \"card\",\n      \"country\": \"US\",\n      \"currency\": \"USD\",\n      \"note\": \"Milk, syrups, food\"\n    },\n    {\n      \"id\": \"p_uline\",\n      \"name\": \"Uline\",\n      \"category\": \"supplier\",\n      \"paid_by\": \"card\",\n      \"country\": \"US\",\n      \"currency\": \"USD\",\n      \"note\": \"Cups, lids, paper goods\"\n    },\n    {\n      \"id\": \"p_oatly\",\n      \"name\": \"Oatly Distribution\",\n      \"category\": \"supplier\",\n      \"paid_by\": \"bank\",\n      \"country\": \"US\",\n      \"currency\": \"USD\",\n      \"note\": \"Oat milk\"\n    },\n    {\n      \"id\": \"p_meta\",\n      \"name\": \"Meta Ads\",\n      \"category\": \"ads\",\n      \"paid_by\": \"card\",\n      \"country\": \"US\",\n      \"currency\": \"USD\",\n      \"note\": \"Instagram & Facebook\"\n    },\n    {\n      \"id\": \"p_gusto\",\n      \"name\": \"Gusto Payroll\",\n      \"category\": \"payroll\",\n      \"paid_by\": \"bank\",\n      \"country\": \"US\",\n      \"currency\": \"USD\"\n    },\n    {\n      \"id\": \"p_energy\",\n      \"name\": \"Austin Energy\",\n      \"category\": \"utility\",\n      \"paid_by\": \"bank\",\n      \"country\": \"US\",\n      \"currency\": \"USD\"\n    },\n    {\n      \"id\": \"p_square\",\n      \"name\": \"Square\",\n      \"category\": \"software\",\n      \"paid_by\": \"card\",\n      \"country\": \"US\",\n      \"currency\": \"USD\",\n      \"note\": \"POS subscription\"\n    }\n  ]\n}"
+    }
+  ],
+  "structuredContent": {
+    "payees": [
+      {
+        "id": "p_cc",
+        "name": "Counter Culture Coffee",
+        "category": "supplier",
+        "paid_by": "bank",
+        "country": "US",
+        "currency": "USD",
+        "note": "Beans · net 15"
+      },
+      {
+        "id": "p_sysco",
+        "name": "Sysco",
+        "category": "supplier",
+        "paid_by": "card",
+        "country": "US",
+        "currency": "USD",
+        "note": "Milk, syrups, food"
+      },
+      {
+        "id": "p_uline",
+        "name": "Uline",
+        "category": "supplier",
+        "paid_by": "card",
+        "country": "US",
+        "currency": "USD",
+        "note": "Cups, lids, paper goods"
+      },
+      {
+        "id": "p_oatly",
+        "name": "Oatly Distribution",
+        "category": "supplier",
+        "paid_by": "bank",
+        "country": "US",
+        "currency": "USD",
+        "note": "Oat milk"
+      },
+      {
+        "id": "p_meta",
+        "name": "Meta Ads",
+        "category": "ads",
+        "paid_by": "card",
+        "country": "US",
+        "currency": "USD",
+        "note": "Instagram & Facebook"
+      },
+      {
+        "id": "p_gusto",
+        "name": "Gusto Payroll",
+        "category": "payroll",
+        "paid_by": "bank",
+        "country": "US",
+        "currency": "USD"
+      },
+      {
+        "id": "p_energy",
+        "name": "Austin Energy",
+        "category": "utility",
+        "paid_by": "bank",
+        "country": "US",
+        "currency": "USD"
+      },
+      {
+        "id": "p_square",
+        "name": "Square",
+        "category": "software",
+        "paid_by": "card",
+        "country": "US",
+        "currency": "USD",
+        "note": "POS subscription"
+      }
+    ]
+  }
+}
+
+=== pink.request_payment: ALLOWED case (small amount, known payee, under caps) ===
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"payment_id\": \"pay_f8d283774dd7\",\n  \"decision\": \"allowed\",\n  \"agent\": \"Inventory AI\",\n  \"payee\": \"Counter Culture Coffee\",\n  \"payee_id\": \"p_cc\",\n  \"amount\": 25,\n  \"currency\": \"USD\",\n  \"purpose\": \"test allowed small payment\",\n  \"rule\": \"Small supply orders go through\",\n  \"policy_version\": 1,\n  \"created_at\": \"2026-10-12T21:53:12.092Z\",\n  \"credential\": {\n    \"type\": \"bank_transfer\",\n    \"sandbox\": true,\n    \"max_amount\": 25,\n    \"currency\": \"USD\",\n    \"locked_to\": \"Counter Culture Coffee\",\n    \"single_use\": true,\n    \"expires_at\": \"2026-10-12T22:08:12.092Z\",\n    \"transfer\": {\n      \"rail\": \"ACH\",\n      \"reference\": \"PWS-11F3DF5B\",\n      \"status\": \"submitted\"\n    }\n  }\n}"
+    }
+  ],
+  "structuredContent": {
+    "payment_id": "pay_f8d283774dd7",
+    "decision": "allowed",
+    "agent": "Inventory AI",
+    "payee": "Counter Culture Coffee",
+    "payee_id": "p_cc",
+    "amount": 25,
+    "currency": "USD",
+    "purpose": "test allowed small payment",
+    "rule": "Small supply orders go through",
+    "policy_version": 1,
+    "created_at": "2026-10-12T21:53:12.092Z",
+    "credential": {
+      "type": "bank_transfer",
+      "sandbox": true,
+      "max_amount": 25,
+      "currency": "USD",
+      "locked_to": "Counter Culture Coffee",
+      "single_use": true,
+      "expires_at": "2026-10-12T22:08:12.092Z",
+      "transfer": {
+        "rail": "ACH",
+        "reference": "PWS-11F3DF5B",
+        "status": "submitted"
+      }
+    }
+  }
+}
+
+=== pink.request_payment: BLOCKED case (amount over monthly budget left) ===
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"payment_id\": \"pay_9dfe9bcfa449\",\n  \"decision\": \"blocked\",\n  \"agent\": \"Inventory AI\",\n  \"payee\": \"Counter Culture Coffee\",\n  \"payee_id\": \"p_cc\",\n  \"amount\": 999999,\n  \"currency\": \"USD\",\n  \"purpose\": \"test over-budget blocked payment\",\n  \"rule\": \"Inventory AI's monthly budget is used up\",\n  \"policy_version\": 1,\n  \"created_at\": \"2026-10-12T21:53:12.213Z\",\n  \"credential\": null,\n  \"retry_after\": null,\n  \"why\": \"$1,205 used of $2,500 · this would exceed it\"\n}"
+    }
+  ],
+  "structuredContent": {
+    "payment_id": "pay_9dfe9bcfa449",
+    "decision": "blocked",
+    "agent": "Inventory AI",
+    "payee": "Counter Culture Coffee",
+    "payee_id": "p_cc",
+    "amount": 999999,
+    "currency": "USD",
+    "purpose": "test over-budget blocked payment",
+    "rule": "Inventory AI's monthly budget is used up",
+    "policy_version": 1,
+    "created_at": "2026-10-12T21:53:12.213Z",
+    "credential": null,
+    "retry_after": null,
+    "why": "$1,205 used of $2,500 · this would exceed it"
+  }
+}
+
+=== pink.request_payment: PENDING_HUMAN case (new/unlisted payee triggers owner approval) ===
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"payment_id\": \"pay_14d37bcf3c24\",\n  \"decision\": \"pending_human\",\n  \"agent\": \"Inventory AI\",\n  \"payee\": \"A New Supplier Not On The List\",\n  \"payee_id\": null,\n  \"amount\": 60,\n  \"currency\": \"USD\",\n  \"purpose\": \"test approval-threshold payment\",\n  \"rule\": \"New payee: always ask the owner\",\n  \"policy_version\": 1,\n  \"created_at\": \"2026-10-12T21:53:12.341Z\",\n  \"hold_id\": \"pay_14d37bcf3c24\",\n  \"approvers_needed\": 1,\n  \"approvals_so_far\": 0,\n  \"who\": \"Maya Chen (Owner)\",\n  \"expires_at\": \"2026-10-12T22:23:12.341Z\",\n  \"poll\": \"pink.get_credential(hold_id) · or GET /v1/payments/{id}\"\n}"
+    }
+  ],
+  "structuredContent": {
+    "payment_id": "pay_14d37bcf3c24",
+    "decision": "pending_human",
+    "agent": "Inventory AI",
+    "payee": "A New Supplier Not On The List",
+    "payee_id": null,
+    "amount": 60,
+    "currency": "USD",
+    "purpose": "test approval-threshold payment",
+    "rule": "New payee: always ask the owner",
+    "policy_version": 1,
+    "created_at": "2026-10-12T21:53:12.341Z",
+    "hold_id": "pay_14d37bcf3c24",
+    "approvers_needed": 1,
+    "approvals_so_far": 0,
+    "who": "Maya Chen (Owner)",
+    "expires_at": "2026-10-12T22:23:12.341Z",
+    "poll": "pink.get_credential(hold_id) · or GET /v1/payments/{id}"
+  }
+}
+
+=== TEST 2b: official MCP Inspector CLI (npx @modelcontextprotocol/inspector --cli),
+    tools/list against the built dist/bin.js, agent = Marketing AI ===
+[pink-agentic-payments-mcp] bridging stdio <-> https://agentic-sandbox.pinkwallet.com/mcp
+{
+  "tools": [
+    {
+      "name": "pink.get_budget",
+      "title": "My budget and limits",
+      "description": "What this agent may still spend: monthly budget left, spent today, single-payment cap, vault balances, company daily ceiling.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "pink.list_payees",
+      "title": "Approved payees",
+      "description": "Suppliers, platforms and contractors this company has approved. Paying anyone else stops and asks a person.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "pink.list_rules",
+      "title": "Rules that apply to me",
+      "description": "The policy rules that apply to this agent, in evaluation order. First match decides: allow, ask, or block. Time-of-day rules show the timezone (tz) the server reads them in.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "pink.check_policy",
+      "title": "Would this payment clear?",
+      "description": "Dry run. Returns would_allow / would_ask / would_block with the rule and the full decision trace. Nothing is spent or held.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "payee_id": {
+            "type": "string",
+            "description": "Id from pink.list_payees. Omit for a payee not on the list."
+          },
+          "payee_name": {
+            "type": "string",
+            "description": "Name of the payee. Required if payee_id is omitted."
+          },
+          "amount": {
+            "type": "number",
+            "description": "Amount in the payment currency"
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "USD",
+              "EUR",
+              "GBP",
+              "HKD",
+              "SGD",
+              "JPY"
+            ],
+            "default": "USD"
+          },
+          "purpose": {
+            "type": "string",
+            "description": "What this payment is for, in one line (shown to approvers)"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Why you are making it now: the data you saw, the threshold that triggered it (shown to approvers)"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "References you can attach: PO number, invoice id, ticket id, statement id, photos"
+          },
+          "evidence_flags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "po",
+                "sow",
+                "ticket",
+                "scan",
+                "statement",
+                "brief",
+                "renewal",
+                "dupInvoice",
+                "payeeChanged",
+                "repeatCustomer",
+                "deposit"
+              ]
+            },
+            "description": "Structured evidence and signals: po (matching purchase order), sow (signed SOW), ticket (helpdesk ticket), scan (warehouse scan), statement (matches carrier/cloud statement), brief (signed creator brief), renewal (within 10% of last invoice), dupInvoice, payeeChanged, repeatCustomer, deposit"
+          },
+          "local_hour": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 23,
+            "description": "Dry run only: simulate this hour of day (0-23) in the rule's timezone for pink.check_policy. pink.request_payment ignores it and uses the server clock."
+          }
+        },
+        "required": [
+          "amount",
+          "purpose"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "pink.request_payment",
+      "title": "Request a payment",
+      "description": "The real call. Returns \"allowed\" with a single-use credential, \"pending_human\" with a hold_id while a person is asked, or \"blocked\" with the reason. Pass idempotency_key to make retries safe.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "payee_id": {
+            "type": "string",
+            "description": "Id from pink.list_payees. Omit for a payee not on the list."
+          },
+          "payee_name": {
+            "type": "string",
+            "description": "Name of the payee. Required if payee_id is omitted."
+          },
+          "amount": {
+            "type": "number",
+            "description": "Amount in the payment currency"
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "USD",
+              "EUR",
+              "GBP",
+              "HKD",
+              "SGD",
+              "JPY"
+            ],
+            "default": "USD"
+          },
+          "purpose": {
+            "type": "string",
+            "description": "What this payment is for, in one line (shown to approvers)"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Why you are making it now: the data you saw, the threshold that triggered it (shown to approvers)"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "References you can attach: PO number, invoice id, ticket id, statement id, photos"
+          },
+          "evidence_flags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "po",
+                "sow",
+                "ticket",
+                "scan",
+                "statement",
+                "brief",
+                "renewal",
+                "dupInvoice",
+                "payeeChanged",
+                "repeatCustomer",
+                "deposit"
+              ]
+            },
+            "description": "Structured evidence and signals: po (matching purchase order), sow (signed SOW), ticket (helpdesk ticket), scan (warehouse scan), statement (matches carrier/cloud statement), brief (signed creator brief), renewal (within 10% of last invoice), dupInvoice, payeeChanged, repeatCustomer, deposit"
+          },
+          "local_hour": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 23,
+            "description": "Dry run only: simulate this hour of day (0-23) in the rule's timezone for pink.check_policy. pink.request_payment ignores it and uses the server clock."
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Any unique string per payment attempt. Repeating a key returns the original decision instead of paying twice; reusing it for a different payment is refused."
+          }
+        },
+        "required": [
+          "amount",
+          "purpose"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "pink.get_credential",
+      "title": "Poll a hold",
+      "description": "Check a pending payment. When a person approves, this returns the credential. Also works for any payment_id.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "hold_id": {
+            "type": "string",
+            "description": "The hold_id / payment_id returned by pink.request_payment"
+          }
+        },
+        "required": [
+          "hold_id"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "pink.report_receipt",
+      "title": "File the receipt",
+      "description": "After paying, file the receipt or invoice so the payment is reconciled and your trust score goes up.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "payment_id": {
+            "type": "string"
+          },
+          "receipt": {
+            "type": "object",
+            "properties": {
+              "merchant": {
+                "type": "string"
+              },
+              "total": {
+                "type": "number"
+              },
+              "currency": {
+                "type": "string"
+              },
+              "reference": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "note": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required": [
+          "payment_id",
+          "receipt"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    }
+  ]
+}
+
+================================================================
+=== TEST 3: npm pack + npx -y ./pink-agentic-payments-mcp-0.1.0.tgz in a clean /tmp dir ===
+Sandbox workspace id: rtthxqd77x (excluded from metrics). Agent used: Payroll & Bills AI.
+Note: this agent's rules do not allow paying p_cc, so the allowed-case call returns
+blocked here instead of allowed -- that is correct per-agent policy, not a bridge bug.
+The earlier ALLOWED decision (credential issued) was proven live with the Inventory AI
+agent further up in this file, over the built dist/ server (not the tarball).
+================================================================
+=== tools/list ===
+[server stderr] [pink-agentic-payments-mcp] bridging stdio <-> https://agentic-sandbox.pinkwallet.com/mcp
+{
+  "tools": [
+    {
+      "name": "pink.get_budget",
+      "title": "My budget and limits",
+      "description": "What this agent may still spend: monthly budget left, spent today, single-payment cap, vault balances, company daily ceiling.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "pink.list_payees",
+      "title": "Approved payees",
+      "description": "Suppliers, platforms and contractors this company has approved. Paying anyone else stops and asks a person.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "pink.list_rules",
+      "title": "Rules that apply to me",
+      "description": "The policy rules that apply to this agent, in evaluation order. First match decides: allow, ask, or block. Time-of-day rules show the timezone (tz) the server reads them in.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "pink.check_policy",
+      "title": "Would this payment clear?",
+      "description": "Dry run. Returns would_allow / would_ask / would_block with the rule and the full decision trace. Nothing is spent or held.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "payee_id": {
+            "type": "string",
+            "description": "Id from pink.list_payees. Omit for a payee not on the list."
+          },
+          "payee_name": {
+            "type": "string",
+            "description": "Name of the payee. Required if payee_id is omitted."
+          },
+          "amount": {
+            "type": "number",
+            "description": "Amount in the payment currency"
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "USD",
+              "EUR",
+              "GBP",
+              "HKD",
+              "SGD",
+              "JPY"
+            ],
+            "default": "USD"
+          },
+          "purpose": {
+            "type": "string",
+            "description": "What this payment is for, in one line (shown to approvers)"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Why you are making it now: the data you saw, the threshold that triggered it (shown to approvers)"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "References you can attach: PO number, invoice id, ticket id, statement id, photos"
+          },
+          "evidence_flags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "po",
+                "sow",
+                "ticket",
+                "scan",
+                "statement",
+                "brief",
+                "renewal",
+                "dupInvoice",
+                "payeeChanged",
+                "repeatCustomer",
+                "deposit"
+              ]
+            },
+            "description": "Structured evidence and signals: po (matching purchase order), sow (signed SOW), ticket (helpdesk ticket), scan (warehouse scan), statement (matches carrier/cloud statement), brief (signed creator brief), renewal (within 10% of last invoice), dupInvoice, payeeChanged, repeatCustomer, deposit"
+          },
+          "local_hour": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 23,
+            "description": "Dry run only: simulate this hour of day (0-23) in the rule's timezone for pink.check_policy. pink.request_payment ignores it and uses the server clock."
+          }
+        },
+        "required": [
+          "amount",
+          "purpose"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "pink.request_payment",
+      "title": "Request a payment",
+      "description": "The real call. Returns \"allowed\" with a single-use credential, \"pending_human\" with a hold_id while a person is asked, or \"blocked\" with the reason. Pass idempotency_key to make retries safe.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "payee_id": {
+            "type": "string",
+            "description": "Id from pink.list_payees. Omit for a payee not on the list."
+          },
+          "payee_name": {
+            "type": "string",
+            "description": "Name of the payee. Required if payee_id is omitted."
+          },
+          "amount": {
+            "type": "number",
+            "description": "Amount in the payment currency"
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "USD",
+              "EUR",
+              "GBP",
+              "HKD",
+              "SGD",
+              "JPY"
+            ],
+            "default": "USD"
+          },
+          "purpose": {
+            "type": "string",
+            "description": "What this payment is for, in one line (shown to approvers)"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Why you are making it now: the data you saw, the threshold that triggered it (shown to approvers)"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "References you can attach: PO number, invoice id, ticket id, statement id, photos"
+          },
+          "evidence_flags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "po",
+                "sow",
+                "ticket",
+                "scan",
+                "statement",
+                "brief",
+                "renewal",
+                "dupInvoice",
+                "payeeChanged",
+                "repeatCustomer",
+                "deposit"
+              ]
+            },
+            "description": "Structured evidence and signals: po (matching purchase order), sow (signed SOW), ticket (helpdesk ticket), scan (warehouse scan), statement (matches carrier/cloud statement), brief (signed creator brief), renewal (within 10% of last invoice), dupInvoice, payeeChanged, repeatCustomer, deposit"
+          },
+          "local_hour": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 23,
+            "description": "Dry run only: simulate this hour of day (0-23) in the rule's timezone for pink.check_policy. pink.request_payment ignores it and uses the server clock."
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Any unique string per payment attempt. Repeating a key returns the original decision instead of paying twice; reusing it for a different payment is refused."
+          }
+        },
+        "required": [
+          "amount",
+          "purpose"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "pink.get_credential",
+      "title": "Poll a hold",
+      "description": "Check a pending payment. When a person approves, this returns the credential. Also works for any payment_id.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "hold_id": {
+            "type": "string",
+            "description": "The hold_id / payment_id returned by pink.request_payment"
+          }
+        },
+        "required": [
+          "hold_id"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "pink.report_receipt",
+      "title": "File the receipt",
+      "description": "After paying, file the receipt or invoice so the payment is reconciled and your trust score goes up.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "payment_id": {
+            "type": "string"
+          },
+          "receipt": {
+            "type": "object",
+            "properties": {
+              "merchant": {
+                "type": "string"
+              },
+              "total": {
+                "type": "number"
+              },
+              "currency": {
+                "type": "string"
+              },
+              "reference": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "note": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required": [
+          "payment_id",
+          "receipt"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    }
+  ]
+}
+
+=== pink.get_budget ===
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"agent\": \"Payroll & Bills AI\",\n  \"status\": \"active\",\n  \"monthly_budget\": 32000,\n  \"spent_this_month\": 14790,\n  \"left_this_month\": 17210,\n  \"spent_today\": 0,\n  \"single_payment_cap\": 15000,\n  \"vault\": {\n    \"id\": \"v_pay\",\n    \"name\": \"Payroll reserve\",\n    \"balances\": {\n      \"USD\": 31900\n    }\n  },\n  \"company_daily_ceiling\": 6000,\n  \"company_spent_today\": 25,\n  \"policy_version\": 1\n}"
+    }
+  ],
+  "structuredContent": {
+    "agent": "Payroll & Bills AI",
+    "status": "active",
+    "monthly_budget": 32000,
+    "spent_this_month": 14790,
+    "left_this_month": 17210,
+    "spent_today": 0,
+    "single_payment_cap": 15000,
+    "vault": {
+      "id": "v_pay",
+      "name": "Payroll reserve",
+      "balances": {
+        "USD": 31900
+      }
+    },
+    "company_daily_ceiling": 6000,
+    "company_spent_today": 25,
+    "policy_version": 1
+  }
+}
+
+=== pink.list_payees ===
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"payees\": [\n    {\n      \"id\": \"p_cc\",\n      \"name\": \"Counter Culture Coffee\",\n      \"category\": \"supplier\",\n      \"paid_by\": \"bank\",\n      \"country\": \"US\",\n      \"currency\": \"USD\",\n      \"note\": \"Beans · net 15\"\n    },\n    {\n      \"id\": \"p_sysco\",\n      \"name\": \"Sysco\",\n      \"category\": \"supplier\",\n      \"paid_by\": \"card\",\n      \"country\": \"US\",\n      \"currency\": \"USD\",\n      \"note\": \"Milk, syrups, food\"\n    },\n    {\n      \"id\": \"p_uline\",\n      \"name\": \"Uline\",\n      \"category\": \"supplier\",\n      \"paid_by\": \"card\",\n      \"country\": \"US\",\n      \"currency\": \"USD\",\n      \"note\": \"Cups, lids, paper goods\"\n    },\n    {\n      \"id\": \"p_oatly\",\n      \"name\": \"Oatly Distribution\",\n      \"category\": \"supplier\",\n      \"paid_by\": \"bank\",\n      \"country\": \"US\",\n      \"currency\": \"USD\",\n      \"note\": \"Oat milk\"\n    },\n    {\n      \"id\": \"p_meta\",\n      \"name\": \"Meta Ads\",\n      \"category\": \"ads\",\n      \"paid_by\": \"card\",\n      \"country\": \"US\",\n      \"currency\": \"USD\",\n      \"note\": \"Instagram & Facebook\"\n    },\n    {\n      \"id\": \"p_gusto\",\n      \"name\": \"Gusto Payroll\",\n      \"category\": \"payroll\",\n      \"paid_by\": \"bank\",\n      \"country\": \"US\",\n      \"currency\": \"USD\"\n    },\n    {\n      \"id\": \"p_energy\",\n      \"name\": \"Austin Energy\",\n      \"category\": \"utility\",\n      \"paid_by\": \"bank\",\n      \"country\": \"US\",\n      \"currency\": \"USD\"\n    },\n    {\n      \"id\": \"p_square\",\n      \"name\": \"Square\",\n      \"category\": \"software\",\n      \"paid_by\": \"card\",\n      \"country\": \"US\",\n      \"currency\": \"USD\",\n      \"note\": \"POS subscription\"\n    }\n  ]\n}"
+    }
+  ],
+  "structuredContent": {
+    "payees": [
+      {
+        "id": "p_cc",
+        "name": "Counter Culture Coffee",
+        "category": "supplier",
+        "paid_by": "bank",
+        "country": "US",
+        "currency": "USD",
+        "note": "Beans · net 15"
+      },
+      {
+        "id": "p_sysco",
+        "name": "Sysco",
+        "category": "supplier",
+        "paid_by": "card",
+        "country": "US",
+        "currency": "USD",
+        "note": "Milk, syrups, food"
+      },
+      {
+        "id": "p_uline",
+        "name": "Uline",
+        "category": "supplier",
+        "paid_by": "card",
+        "country": "US",
+        "currency": "USD",
+        "note": "Cups, lids, paper goods"
+      },
+      {
+        "id": "p_oatly",
+        "name": "Oatly Distribution",
+        "category": "supplier",
+        "paid_by": "bank",
+        "country": "US",
+        "currency": "USD",
+        "note": "Oat milk"
+      },
+      {
+        "id": "p_meta",
+        "name": "Meta Ads",
+        "category": "ads",
+        "paid_by": "card",
+        "country": "US",
+        "currency": "USD",
+        "note": "Instagram & Facebook"
+      },
+      {
+        "id": "p_gusto",
+        "name": "Gusto Payroll",
+        "category": "payroll",
+        "paid_by": "bank",
+        "country": "US",
+        "currency": "USD"
+      },
+      {
+        "id": "p_energy",
+        "name": "Austin Energy",
+        "category": "utility",
+        "paid_by": "bank",
+        "country": "US",
+        "currency": "USD"
+      },
+      {
+        "id": "p_square",
+        "name": "Square",
+        "category": "software",
+        "paid_by": "card",
+        "country": "US",
+        "currency": "USD",
+        "note": "POS subscription"
+      }
+    ]
+  }
+}
+
+=== pink.request_payment: ALLOWED case (small amount, known payee, under caps) ===
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"payment_id\": \"pay_91e26a2af5aa\",\n  \"decision\": \"blocked\",\n  \"agent\": \"Payroll & Bills AI\",\n  \"payee\": \"Counter Culture Coffee\",\n  \"payee_id\": \"p_cc\",\n  \"amount\": 25,\n  \"currency\": \"USD\",\n  \"purpose\": \"test allowed small payment\",\n  \"rule\": \"No rule allows this payment\",\n  \"policy_version\": 1,\n  \"created_at\": \"2026-10-12T21:55:23.215Z\",\n  \"credential\": null,\n  \"retry_after\": null,\n  \"why\": \"default is block\"\n}"
+    }
+  ],
+  "structuredContent": {
+    "payment_id": "pay_91e26a2af5aa",
+    "decision": "blocked",
+    "agent": "Payroll & Bills AI",
+    "payee": "Counter Culture Coffee",
+    "payee_id": "p_cc",
+    "amount": 25,
+    "currency": "USD",
+    "purpose": "test allowed small payment",
+    "rule": "No rule allows this payment",
+    "policy_version": 1,
+    "created_at": "2026-10-12T21:55:23.215Z",
+    "credential": null,
+    "retry_after": null,
+    "why": "default is block"
+  }
+}
+
+=== pink.request_payment: BLOCKED case (amount over monthly budget left) ===
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"payment_id\": \"pay_63acb7f32786\",\n  \"decision\": \"blocked\",\n  \"agent\": \"Payroll & Bills AI\",\n  \"payee\": \"Counter Culture Coffee\",\n  \"payee_id\": \"p_cc\",\n  \"amount\": 999999,\n  \"currency\": \"USD\",\n  \"purpose\": \"test over-budget blocked payment\",\n  \"rule\": \"Payroll & Bills AI's monthly budget is used up\",\n  \"policy_version\": 1,\n  \"created_at\": \"2026-10-12T21:55:23.332Z\",\n  \"credential\": null,\n  \"retry_after\": null,\n  \"why\": \"$14,790 used of $32,000 · this would exceed it\"\n}"
+    }
+  ],
+  "structuredContent": {
+    "payment_id": "pay_63acb7f32786",
+    "decision": "blocked",
+    "agent": "Payroll & Bills AI",
+    "payee": "Counter Culture Coffee",
+    "payee_id": "p_cc",
+    "amount": 999999,
+    "currency": "USD",
+    "purpose": "test over-budget blocked payment",
+    "rule": "Payroll & Bills AI's monthly budget is used up",
+    "policy_version": 1,
+    "created_at": "2026-10-12T21:55:23.332Z",
+    "credential": null,
+    "retry_after": null,
+    "why": "$14,790 used of $32,000 · this would exceed it"
+  }
+}
+
+=== pink.request_payment: PENDING_HUMAN case (new/unlisted payee triggers owner approval) ===
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"payment_id\": \"pay_66540c431a4d\",\n  \"decision\": \"pending_human\",\n  \"agent\": \"Payroll & Bills AI\",\n  \"payee\": \"A New Supplier Not On The List\",\n  \"payee_id\": null,\n  \"amount\": 60,\n  \"currency\": \"USD\",\n  \"purpose\": \"test approval-threshold payment\",\n  \"rule\": \"New payee: always ask the owner\",\n  \"policy_version\": 1,\n  \"created_at\": \"2026-10-12T21:55:23.458Z\",\n  \"hold_id\": \"pay_66540c431a4d\",\n  \"approvers_needed\": 1,\n  \"approvals_so_far\": 0,\n  \"who\": \"Maya Chen (Owner)\",\n  \"expires_at\": \"2026-10-12T22:25:23.458Z\",\n  \"poll\": \"pink.get_credential(hold_id) · or GET /v1/payments/{id}\"\n}"
+    }
+  ],
+  "structuredContent": {
+    "payment_id": "pay_66540c431a4d",
+    "decision": "pending_human",
+    "agent": "Payroll & Bills AI",
+    "payee": "A New Supplier Not On The List",
+    "payee_id": null,
+    "amount": 60,
+    "currency": "USD",
+    "purpose": "test approval-threshold payment",
+    "rule": "New payee: always ask the owner",
+    "policy_version": 1,
+    "created_at": "2026-10-12T21:55:23.458Z",
+    "hold_id": "pay_66540c431a4d",
+    "approvers_needed": 1,
+    "approvals_so_far": 0,
+    "who": "Maya Chen (Owner)",
+    "expires_at": "2026-10-12T22:25:23.458Z",
+    "poll": "pink.get_credential(hold_id) · or GET /v1/payments/{id}"
+  }
+}

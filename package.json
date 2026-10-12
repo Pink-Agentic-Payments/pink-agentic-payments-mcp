@@ -1,0 +1,54 @@
+{
+  "name": "pink-agentic-payments-mcp",
+  "version": "0.1.0",
+  "description": "Local stdio MCP server that bridges any MCP client (Claude Desktop, Cursor, VS Code, Windsurf, n8n) to the Pink Agentic AI Payments remote MCP server.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "pink-agentic-payments-mcp": "./dist/bin.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "server.json"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "prepare": "npm run build",
+    "test:live": "tsx scripts/test-live.ts"
+  },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "ai-agents",
+    "agent-payments",
+    "payments",
+    "pinkwallet",
+    "pink"
+  ],
+  "homepage": "https://pinkwallet.com/agentic/developers/connect-via-mcp/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Pink-Agentic-Payments/pink-agentic-payments-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Pink-Agentic-Payments/pink-agentic-payments-mcp/issues"
+  },
+  "license": "MIT",
+  "author": "PinkWallet",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3"
+  }
+}

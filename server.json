@@ -1,0 +1,34 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
+  "name": "io.github.pink-agentic-payments/pink-agentic-payments-mcp",
+  "description": "Pink Agentic AI Payments: a stdio MCP server that bridges any MCP client to Pink's remote payments MCP server, so AI agents can request payments checked against company spending rules (budgets, payee allow-lists, human approval) before a credential is issued. Sandbox preview, test money.",
+  "repository": {
+    "url": "https://github.com/Pink-Agentic-Payments/pink-agentic-payments-mcp",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "pink-agentic-payments-mcp",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "PINK_AGENT_API_KEY",
+          "description": "Agent API key from a Pink sandbox workspace (create one free, no signup, at https://agentic-sandbox.pinkwallet.com or via `npx pink-agentic-payments-mcp --create-sandbox`).",
+          "isRequired": true,
+          "isSecret": true
+        },
+        {
+          "name": "PINK_MCP_URL",
+          "description": "Remote Pink MCP endpoint to bridge to. Defaults to the public sandbox: https://agentic-sandbox.pinkwallet.com/mcp",
+          "isRequired": false,
+          "isSecret": false
+        }
+      ]
+    }
+  ]
+}
