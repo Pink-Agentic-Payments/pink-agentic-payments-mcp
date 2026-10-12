@@ -1,12 +1,27 @@
 {
-  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
-  "name": "io.github.pink-agentic-payments/pink-agentic-payments-mcp",
-  "description": "Pink Agentic AI Payments: a stdio MCP server that bridges any MCP client to Pink's remote payments MCP server, so AI agents can request payments checked against company spending rules (budgets, payee allow-lists, human approval) before a credential is issued. Sandbox preview, test money.",
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "com.pinkwallet/agentic-payments-sandbox",
+  "description": "Approval layer for AI agent payments: budgets, rules, human approval. Sandbox, test credentials.",
+  "version": "0.1.2",
+  "websiteUrl": "https://pinkwallet.com/agentic/developers/",
   "repository": {
     "url": "https://github.com/Pink-Agentic-Payments/pink-agentic-payments-mcp",
     "source": "github"
   },
-  "version": "0.1.0",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://agentic-sandbox.pinkwallet.com/mcp",
+      "headers": [
+        {
+          "name": "Authorization",
+          "description": "Optional. OAuth 2.1 is available (discovery at /.well-known/oauth-authorization-server, dynamic client registration, PKCE S256, consent page); or a Bearer sandbox agent key (pk_sandbox_agent_*) issued by POST /v1/sandbox/workspaces or the create-workspace form at https://agentic-sandbox.pinkwallet.com/.",
+          "isRequired": false,
+          "isSecret": true
+        }
+      ]
+    }
+  ],
   "packages": [
     {
       "registryType": "npm",

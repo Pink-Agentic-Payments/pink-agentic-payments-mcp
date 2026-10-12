@@ -1,9 +1,10 @@
 name: Publish to npm
 
-# DORMANT: this workflow needs an npm Trusted Publisher (OIDC) configured
-# on npmjs.com for this package before it can succeed. No npm account has
-# published this package yet, so do not cut a release/tag until that is
-# set up.
+# STATUS: first release (0.1.0) uses a short-lived npm granular token
+# (NPM_TOKEN repo secret) because npm Trusted Publishers can only be
+# configured once the package already exists on the registry. Once 0.1.0
+# is live, a Trusted Publisher is configured on npmjs.com and this workflow
+# switches to OIDC (no NPM_TOKEN needed).
 #
 # Only runs on a release tag (e.g. v0.1.0), never on every push.
 on:
@@ -29,8 +30,6 @@ jobs:
       - run: npm ci
       - run: npm run build
 
-      # Requires npm >= 11.5 configured as a Trusted Publisher for this
-      # package on npmjs.com (Settings -> Trusted Publisher -> GitHub
-      # Actions, pointing at this repo + this workflow file). No NPM_TOKEN
-      # secret needed; auth is via OIDC.
       - run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
