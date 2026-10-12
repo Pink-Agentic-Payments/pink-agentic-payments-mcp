@@ -89,7 +89,7 @@ These are live from the remote server's `tools/list` response (see [`TEST-OUTPUT
 
 ## Status
 
-Sandbox preview. This package is not yet published to npm — install it for now by cloning this repo and running `npm install && npm run build`, or build the tarball yourself with `npm pack`.
+Sandbox preview (test money only). Published on npm as [`pink-agentic-payments-mcp`](https://www.npmjs.com/package/pink-agentic-payments-mcp) — `npx -y pink-agentic-payments-mcp` is all you need, no clone or build step required.
 
 ## License
 
