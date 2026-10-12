@@ -1,6 +1,6 @@
 {
   "name": "pink-agentic-payments-mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Local stdio MCP server that bridges any MCP client (Claude Desktop, Cursor, VS Code, Windsurf, n8n) to the Pink Agentic AI Payments remote MCP server.",
   "type": "module",
   "main": "./dist/index.js",
