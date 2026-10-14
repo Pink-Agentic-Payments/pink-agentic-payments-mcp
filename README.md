@@ -1,10 +1,18 @@
-# pink-agentic-payments-mcp
+# Pink Agentic AI Payments MCP server: let Claude, ChatGPT or Cursor pay vendors and invoices within spending rules
 
-Pink Agentic AI Payments checks every payment an agent requests against company spending rules (budgets, payee allow-lists, human approval) before any payment credential is issued.
+`pink-agentic-payments-mcp` is the MCP server for **Pink Agentic AI Payments** (by PinkWallet). It lets an AI agent in Claude, ChatGPT, Cursor, VS Code, Windsurf or any other MCP client request a payment, such as paying a vendor invoice or topping up API credits, and Pink checks that payment against the company's spending rules (per-agent budgets, single-payment caps, payee allow-lists, human approval above a threshold) **before** any payment credential is issued. The agent never holds a standing card or key.
 
-This package is a local **stdio** MCP server that bridges any MCP client (Claude Desktop, Cursor, VS Code, Windsurf, n8n's MCP client, and others) to Pink's remote Streamable HTTP MCP server. It forwards `tools/list` and `tools/call` (and resources/prompts, if the remote adds them) transparently, so the local server always reflects whatever tools Pink's remote server currently exposes — nothing is hardcoded.
+Every payment request gets one of three answers: `allowed` (with a single-use credential), `pending_human` (a person is asked first), or `blocked` (with the reason).
 
-Sandbox preview: test money only, no signup required to get a key.
+**Sandbox preview: test money only, no signup required to get a key.**
+
+## Can Claude or ChatGPT pay an invoice through MCP?
+
+Yes, with limits you set. Connect Pink as an MCP server, and the agent gets 7 payment tools (listed [below](#tools)). Asked to "pay the Acme invoice for $1,200", the agent calls `pink.check_policy` or `pink.request_payment`; Pink pays only if the invoice fits the rules, asks a person if it needs approval, or refuses and says why. Setup guides: [Claude](https://pinkwallet.com/agentic/connect/claude) · [ChatGPT (developer mode)](https://pinkwallet.com/agentic/connect/chatgpt) · [Cursor](https://pinkwallet.com/agentic/connect/cursor) · [Claude Code](https://pinkwallet.com/agentic/connect/claude-code) · [Walkthrough: an MCP server that lets AI agents pay invoices](https://pinkwallet.com/agentic/learn/mcp-server-for-ai-agents-to-pay-invoices).
+
+## How this package works
+
+This package is a local **stdio** MCP server that bridges any MCP client to Pink's remote Streamable HTTP MCP server (`https://agentic-sandbox.pinkwallet.com/mcp`). It forwards `tools/list` and `tools/call` (and resources/prompts, if the remote adds them) transparently, so the local server always reflects whatever tools Pink's remote server currently exposes; nothing is hardcoded. Clients that support remote MCP can also connect to that URL directly.
 
 ## Quick start
 
