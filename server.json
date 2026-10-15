@@ -1,8 +1,9 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "com.pinkwallet/agentic-payments-sandbox",
-  "description": "Approval layer for AI agent payments: budgets, rules, human approval. Sandbox, test credentials.",
-  "version": "0.1.2",
+  "title": "Pink Agentic AI Payments",
+  "description": "Pink Agentic AI Payments: AI agents pay within spending rules (budgets, caps, approval). Sandbox.",
+  "version": "0.1.3",
   "websiteUrl": "https://pinkwallet.com/agentic/developers/",
   "repository": {
     "url": "https://github.com/Pink-Agentic-Payments/pink-agentic-payments-mcp",
@@ -26,7 +27,7 @@
     {
       "registryType": "npm",
       "identifier": "pink-agentic-payments-mcp",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "transport": {
         "type": "stdio"
       },
