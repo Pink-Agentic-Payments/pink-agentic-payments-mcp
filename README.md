@@ -2,6 +2,9 @@
 
 `pink-agentic-payments-mcp` is the MCP server for **Pink Agentic AI Payments** (by PinkWallet). It lets an AI agent in Claude, ChatGPT, Cursor, VS Code, Windsurf or any other MCP client request a payment, such as paying a vendor invoice or topping up API credits, and Pink checks that payment against the company's spending rules (per-agent budgets, single-payment caps, payee allow-lists, human approval above a threshold) **before** any payment credential is issued. The agent never holds a standing card or key.
 
+> **Production pilot:** a private production tenant (decision-only: Pink decides allow, block or ask a person; your own Stripe, card or bank pays) is available for $99/month. In production, payments above an agent's per-payment limit wait for a person's approval. Details and checkout: https://pinkwallet.com/agentic/pilot/
+
+
 Every payment request gets one of three answers: `allowed` (with a single-use credential), `pending_human` (a person is asked first), or `blocked` (with the reason).
 
 **Sandbox preview: test money only, no signup required to get a key.**
